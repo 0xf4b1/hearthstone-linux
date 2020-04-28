@@ -1,0 +1,3 @@
+void DisableTabBar() {
+	// Stub
+}
