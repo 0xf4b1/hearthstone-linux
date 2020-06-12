@@ -18,18 +18,18 @@ cp $HS_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET
 echo "Copy engine files ..."
 
 cp $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
-cp -r $UNITY_PATH/Data/Mono $TARGET_PATH/Bin/Hearthstone_Data
+cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
 
 echo "Creating stubs ..."
 
 cp client.config $TARGET_PATH
 
-mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Mono/x86_64/lib/System/Library/Frameworks/CoreFoundation.framework
+mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
 
 make -C stubs
 
-cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Mono/x86_64/lib/System/Library/Frameworks/CoreFoundation.framework
-cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Mono/x86_64
+cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
+cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
 
 make -C token
 

@@ -2,6 +2,8 @@
 
 Craft your own linux native Hearthstone client
 
+*Tested with client version 17.4.0.49534*
+
 Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
 
 Even though we don't have to modify any of the game internals, please note that this is unofficial and you might risk a ban when using this method.
