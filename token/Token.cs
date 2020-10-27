@@ -9,7 +9,8 @@ class TestClass {
             Console.WriteLine("Usage: token.exe <token>");
             Environment.Exit(-1);
         }
-        if (args[0].Length != 45) {
+        string token = args[0];
+        if (token[2] != '-' || token[35] != '-') {
             Console.WriteLine("The token should look like this: XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX");
             Environment.Exit(-1);
         }
