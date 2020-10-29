@@ -2,7 +2,7 @@
 
 Craft your own linux native Hearthstone client
 
-*Tested with client version 17.4.0.49534*
+*Tested with client version 18.6.0.63543*
 
 Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
 
@@ -16,7 +16,45 @@ Hearthstone is ©2014 Blizzard Entertainment, Inc. All rights reserved. Heroes o
 
 1) Hearthstone installation from MacOS
 
-Have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place.
+If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can head over to the next step.
+
+To download the required game files, [keg](https://github.com/HearthSim/keg) from the HearthSim project can be used. It's an implementation of Blizzard's NGDP protocol and allows to mirror the contents of the CDN. A slightly modified version is linked into this repository, that allows to download only the needed files for the installation. Use the `ngdp` command from `keg/bin/ngdp`.
+
+Initialize the repository
+
+```
+$ ngdp init
+```
+
+Add the Hearthstone remote
+
+```
+$ ngdp remote add hsb
+```
+
+Update the metadata
+
+```
+$ ngdp fetch hsb --metadata-only
+```
+
+List available versions
+
+```
+$ ngdp inspect hsb
+```
+
+Fetch the game files
+
+```
+$ ngdp fetch hsb --tags OSX --tags enUS --tags Production
+```
+
+Install the current version
+
+```
+$ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
+```
 
 2) Unity Engine files version 2018.4.10f1
 
