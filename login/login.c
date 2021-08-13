@@ -13,7 +13,6 @@ static gboolean closeWebCb(WebKitWebView* webView, GtkWidget* window)
     return TRUE;
 }
 
-
 static void checkUri (const char* uri)
 {
 	char token[70] = "";
@@ -28,14 +27,14 @@ static void checkUri (const char* uri)
 			j++;
 	}
 	token[j] = '\0';
-	printf("%s\n",token);
-if (token[2] == '-' && token[35] == '-') 
-//printf("this not token!");	
-{
-	char* cmd = strcpy("mono token.exe ",token);
-	system(cmd);
-	gtk_main_quit();
-}
+	//printf("%s\n",token);
+	if (token[2] == '-' && token[35] == '-') 
+	{
+		char* cmd = strcpy("mono Token.exe ",token);
+		system(cmd);
+		//TODO native c++ generate token
+		gtk_main_quit();
+	}
 }
 
 static void web_view_load_changed (WebKitWebView  *web_view,
@@ -45,46 +44,25 @@ static void web_view_load_changed (WebKitWebView  *web_view,
     switch (load_event) {
     case WEBKIT_LOAD_STARTED:
 	    {
-		    /* New load, we have now a provisional URI 
-	    	    const char* provisional_uri = webkit_web_view_get_uri (web_view);
-         Here we could start a spinner or update the
-         * location bar with the provisional URI */
 	    	    break;
 	    }
     case WEBKIT_LOAD_REDIRECTED:
 	    {
-	//	    const char* redirected_uri = webkit_web_view_get_uri (web_view);
-	//	    printf("%s\n",redirected_uri);
 	    	    break;
 	    }
     case WEBKIT_LOAD_COMMITTED:
-        /* The load is being performed. Current URI is
-         * the final one and it won't change unless a new
-         * load is requested or a navigation within the
-         * same page is performed */
 	    {
-	//	    const char* uri = webkit_web_view_get_uri (web_view);
-	//	    printf("%s\n",uri);
 	    	    break;
 	    }
     case WEBKIT_LOAD_FINISHED:
-        /* Load finished, we can now stop the spinner */
 	    {
 		    const char* uri = webkit_web_view_get_uri (web_view);
-        //            printf("%s\n",uri);
 		    checkUri(uri);
 	    	    break;
 	    }
     }
 }
 
-/*static void checkUri (const char* uri)
-{
-	char token = uri[5-10];
-	printf(token);
-
-}
-*/
 int main(int argc, char* argv[])
 {
     GtkWidget *win;
@@ -104,7 +82,6 @@ int main(int argc, char* argv[])
     g_signal_connect(web, "load-changed", G_CALLBACK(web_view_load_changed), NULL);
     webkit_web_view_load_uri(web, url);
 
-    
     gtk_widget_grab_focus(GTK_WIDGET(web));
 
     gtk_widget_show_all(win);
