@@ -10,21 +10,26 @@ static gboolean closeWebCb(WebKitWebView *webView, GtkWidget *window) {
 }
 
 static void checkUri(const char *uri) {
-    char token[50] = "";
-    int j = 0;
-    int i = 0;
-    while (uri[i] != '=') {
-        i++;
+    const char *start = strchr(uri, '=');
+    if (!start) {
+        return;
     }
-    for (++i; i < strlen(uri); i++) {
-        if (uri[i] == '&') {
-            break;
-        }
-        token[j] = uri[i];
-        j++;
+    start++;
+
+    const char *end = strchr(start, '&');
+    if (!end) {
+        return;
     }
-    token[j] = '\0';
-    // printf("%s\n",token);
+
+    int length = end - start;
+    if (length >= 50) {
+        return;
+    }
+
+    char token[50];
+    memcpy(token, start, length);
+    token[length] = '\0';
+
     if (token[2] == '-' && token[35] == '-') {
         char cmd[65] = "mono Token.exe ";
         strcat(cmd, token);
