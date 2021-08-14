@@ -37,4 +37,8 @@ make -C token
 
 cp token/Token.exe $TARGET_PATH
 
+make -C login
+
+cp login/login $TARGET_PATH
+
 echo "Done. Now generate your web token, before launching the game!"
