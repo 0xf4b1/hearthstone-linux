@@ -15,7 +15,7 @@ static gboolean closeWebCb(WebKitWebView* webView, GtkWidget* window)
 
 static void checkUri (const char* uri)
 {
-	char token[70] = "";
+	char token[50] = "";
 	int j = 0;
 	int i = 23;
 	for( i ; i < strlen(uri); i++ )
@@ -30,7 +30,8 @@ static void checkUri (const char* uri)
 	//printf("%s\n",token);
 	if (token[2] == '-' && token[35] == '-') 
 	{
-		char* cmd = strcpy("mono Token.exe ",token);
+		char cmd[65] = "mono Token.exe ";
+		strcat(cmd,token);
 		system(cmd);
 		//TODO native c++ generate token
 		gtk_main_quit();
