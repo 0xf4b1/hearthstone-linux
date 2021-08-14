@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 {
     GtkWidget *win;
     WebKitWebView *web;
-    gchar * url = "https://eu.battle.net/login/ru-ru/?app=wtcg";
+    gchar * url = "https://battle.net/login/?app=wtcg";
     gtk_init(&argc, &argv);
 
     win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
