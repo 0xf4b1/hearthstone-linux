@@ -17,8 +17,12 @@ static void checkUri (const char* uri)
 {
 	char token[50] = "";
 	int j = 0;
-	int i = 23;
-	for( i ; i < strlen(uri); i++ )
+	int i = 0;
+	while (uri[i] != '=') 
+	{
+		i++;
+	}
+	for( ++i ; i < strlen(uri); i++ )
 	{
 		if (uri[i] == '&'){
 			break;
