@@ -14,9 +14,16 @@ Hearthstone is ©2014 Blizzard Entertainment, Inc. All rights reserved. Heroes o
 
 ## Installation
 
-1) Hearthstone installation from MacOS
+### 0) Clone the repository
+
+`$ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux`
+
+### 1) Hearthstone installation from MacOS
 
 If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can head over to the next step.
+
+<details>
+  <summary>Download via keg</summary>
 
 To download the required game files, [keg](https://github.com/HearthSim/keg) from the HearthSim project can be used. It's an implementation of Blizzard's NGDP protocol and allows to mirror the contents of the CDN. A slightly modified version is linked into this repository, that allows to download only the needed files for the installation. Use the `ngdp` command from `keg/bin/ngdp`.
 
@@ -55,20 +62,38 @@ Install the current version
 ```
 $ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
 ```
+</details>
 
-2) Unity Engine files version 2018.4.10f1
+### 2) Unity Engine files version 2018.4.10f1
 
-Install Unity Hub from [here](https://store.unity.com/download?ref=personal) and afterwards use this link to install the engine files:
+* Download Unity Hub from [here](https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage)
 
-[unityhub://2018.4.10f1/a0470569e97b](unityhub://2018.4.10f1/a0470569e97b)
+`$ curl -O https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage`
 
-3) Execute the crafting script in the following way:
+* Make the file executable
+
+`$ chmod +x ./UnityHub.AppImage`
+
+* Start Unity Hub with the following url
+
+`$ ./UnityHub.AppImage unityhub://2018.4.10f1/a0470569e97b`
+
+* You can ignore the licensing stuff that may show up, wait until the installation window appears. You don't need to install any of the additional modules.
+
+By default, it should download the files into your home directory in `~/Unity`.
+
+### 3) Execute the crafting script in the following way:
 
 ```
 $ craft.sh <path of the MacOS installation> <Unity path> <target path>
 ```
 
-4) Login
+### 4) Login
+
+Use the `login` app to retrieve the authentication token for your account.
+
+<details>
+  <summary>Alternatively retrieve it manually</summary>
 
 Visit the website https://eu.battle.net/login/en/?app=wtcg, enter your account credentials and you will get the authentication token in the browser's address bar via redirection, similarly to this:
 
@@ -81,8 +106,9 @@ Store the token:
 ```
 $ mono token.exe XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
 ```
+</details>
 
-5) Launch the game!
+### 5) Launch the game!
 
 ```
 $ Bin/Hearthstone.x86_64
@@ -90,9 +116,8 @@ $ Bin/Hearthstone.x86_64
 
 The game runs perfectly besides some features, like the in-game shop, due to missing libraries.
 
-If you are interested what's going on behind the scenes, you can continue reading.
-
-## Crafting
+<details>
+  <summary>If you are interested what's going on behind the scenes, you can continue reading.</summary>
 
 The `craft.sh` script copies and rearranges the needed files for your linux client and additionally does the following tasks:
 
@@ -103,3 +128,4 @@ Since we use the MacOS version, it has some platform specific dependencies we do
 When starting the game client without the Launcher, the game is stuck on the title screen and does not offer something like a login. This happens even on MacOS with the normal installation. But since it tries to read an existing login token from the MacOS registry, the `CoreFoundation` stub is used to provide our manually requested token.
 
 The game tries to read the authentication token from the registry AES encrypted with some static parameters. Based on that logic, a small token tool will be built that encrypts a provided webtoken and stores it in a file named `token`, where the `CoreFoundation` stub reads it from.
+</details>
