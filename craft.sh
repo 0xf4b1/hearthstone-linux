@@ -2,21 +2,15 @@
 
 set -e
 
-HS_PATH=$1
+TARGET_PATH=$(realpath $1)
 UNITY_PATH=$2/Hub/Editor/2018.4.10f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
-TARGET_PATH=$(realpath $3)
 
-mkdir -p $TARGET_PATH
-
-echo "Copy game data files ..."
-
-cp -r $HS_PATH/Data $TARGET_PATH
-cp -r $HS_PATH/Strings $TARGET_PATH
+echo "Rearrange game files ..."
 
 mkdir $TARGET_PATH/Bin
-cp -r $HS_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
-cp $HS_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
-cp $HS_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
+mv $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
+mv $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
+mv $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
 
 echo "Copy engine files ..."
 
