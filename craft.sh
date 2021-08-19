@@ -2,7 +2,60 @@
 
 set -e
 
-TARGET_PATH=$(realpath $1)
+NGDP_BIN=$(realpath keg/bin/ngdp)
+
+setup_keg () {
+    cd keg
+    ./setup.py build
+    cd ..
+}
+
+init_hearthstone () {
+    mkdir hearthstone && cd hearthstone
+    $NGDP_BIN init
+    $NGDP_BIN remote add hsb
+    echo "Not installed" > .version
+}
+
+check_version () {
+    echo "Checking versions"
+    version=$(curl http://us.patch.battle.net:1119/hsb/versions | grep us)
+    version=${version%|*}
+    version=${version##*|}
+    installed=$(cat .version)
+    echo "Online version: $version"
+    echo "Installed version: $installed"
+}
+
+download_hearthstone () {
+    echo "Downloading Hearthstone via keg ..."
+    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch hsb --tags OSX --tags enUS --tags Production
+    $NGDP_BIN install hsb $version --tags OSX --tags enUS --tags Production
+    echo $version > .version
+    cd ..
+}
+
+if [ -z $1 ]; then
+    if [ ! -d hearthstone ]; then
+        echo "Hearthstone installation not found"
+        setup_keg
+        init_hearthstone
+        check_version
+        download_hearthstone
+    else
+        cd hearthstone
+        check_version
+        if [[ ! "$version" = "$installed" ]]; then
+            echo "Update required."
+            rm -rf *
+            download_hearthstone
+        fi
+    fi
+    TARGET_PATH=$(realpath hearthstone)
+else
+    # User-specified Hearthstone installation
+    TARGET_PATH=$(realpath $1)
+fi
 
 UNITY_ENGINE=/Hub/Editor/2018.4.10f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
 
