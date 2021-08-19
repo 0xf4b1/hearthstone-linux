@@ -3,7 +3,26 @@
 set -e
 
 TARGET_PATH=$(realpath $1)
-UNITY_PATH=$2/Hub/Editor/2018.4.10f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
+
+UNITY_ENGINE=/Hub/Editor/2018.4.10f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
+
+download_unity () {
+    echo "Downloading Unity Hub"
+    curl -O https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage
+    chmod +x ./UnityHub.AppImage
+    ./UnityHub.AppImage unityhub://2018.4.10f1/a0470569e97b
+    [ ! -d ~/Unity$UNITY_ENGINE ] && echo "Required Unity Engine files not installed!" && exit 1
+}
+
+if [ -z $2 ]; then
+    if [ ! -d ~/Unity$UNITY_ENGINE ]; then
+        echo "Required Unity Engine files not found in default directory!"
+        download_unity
+    fi
+    UNITY_PATH=~/Unity$UNITY_ENGINE
+else
+    UNITY_PATH=$2$UNITY_ENGINE
+fi
 
 echo "Rearrange game files ..."
 
