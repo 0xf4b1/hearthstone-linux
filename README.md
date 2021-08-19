@@ -2,7 +2,7 @@
 
 Craft your own linux native Hearthstone client
 
-*Tested with client version 18.6.0.63543*
+*Tested with client version 21.0.3.91040.88998*
 
 Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
 
@@ -14,16 +14,26 @@ Hearthstone is ©2014 Blizzard Entertainment, Inc. All rights reserved. Heroes o
 
 ## Installation
 
-### 0) Clone the repository
+### 1) Clone the repository
 
 `$ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux`
 
-### 1) Hearthstone installation from MacOS
+### 2) Hearthstone installation
 
-If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can head over to the next step.
+Just execute the crafting script. You may need to install some required build files.
+
+```
+$ ./craft.sh
+```
+
+If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can specify the path as the first argument and skip the download. If you have Unity files not in `~/Unity`, you can specify the path as second argument.
+
+```
+$ ./craft.sh [<path of the MacOS installation>] [<Unity path>]
+```
 
 <details>
-  <summary>Download via keg</summary>
+  <summary>Download Hearthstone via keg manually</summary>
 
 To download the required game files, [keg](https://github.com/HearthSim/keg) from the HearthSim project can be used. It's an implementation of Blizzard's NGDP protocol and allows to mirror the contents of the CDN. A slightly modified version is linked into this repository, that allows to download only the needed files for the installation. Use the `ngdp` command from `keg/bin/ngdp`.
 
@@ -64,7 +74,8 @@ $ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
 ```
 </details>
 
-### 2) Unity Engine files version 2018.4.10f1
+<details>
+  <summary>Download Unity Engine files manually</summary>
 
 * Download Unity Hub from [here](https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage)
 
@@ -81,14 +92,9 @@ $ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
 * You can ignore the licensing stuff that may show up, wait until the installation window appears. You don't need to install any of the additional modules.
 
 By default, it should download the files into your home directory in `~/Unity`.
+</details>
 
-### 3) Execute the crafting script in the following way:
-
-```
-$ craft.sh <path of the MacOS installation> <Unity path> <target path>
-```
-
-### 4) Login
+### 3) Login
 
 Use the `login` app to retrieve the authentication token for your account.
 
@@ -108,7 +114,9 @@ $ mono token.exe XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
 ```
 </details>
 
-### 5) Launch the game!
+### 4) Launch the game!
+
+Launch the game via the desktop entry or directly via the executable.
 
 ```
 $ Bin/Hearthstone.x86_64
