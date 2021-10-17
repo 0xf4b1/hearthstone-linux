@@ -65,7 +65,7 @@ download_hearthstone () {
 }
 
 download_unity () {
- echo -e "${GREEN}Downloading Unity 2018.4.10f1 (This is version is required for the game to run)\n\nPlease be patient, this depends on internet speeds.${WHITE}\n"
+ echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity 2018.4.10f1 (This is version is required for the game to run).${WHITE}\n"
  [ ! -d "tmp" ] && mkdir -p tmp
  [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/a0470569e97b/LinuxEditorInstaller/Unity.tar.xz
  echo -e "${GREEN}Done!\n${WHITE}"
@@ -74,6 +74,10 @@ download_unity () {
 move_files_and_cleaup () {
  echo -e "${GREEN}Moving files & running cleanup ...${WHITE}"
  [ ! -d "$TARGET_PATH/Bin" ] && mkdir -p $TARGET_PATH/Bin
+
+ mv $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
+ mv $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
+ mv $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
 
  if [ -f "tmp/Unity.tar.xz" ]; then
    echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
@@ -86,11 +90,12 @@ move_files_and_cleaup () {
      cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
    fi
 
+
  fi
 
- cp -r $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
- cp -r $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
- cp -r $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
+ if [ -d "tmp/MonoBleedingEdge" ]; then
+   cp -r tmp/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
+ fi
 
  echo -e "${GREEN}Done!\n${WHITE}"
 
@@ -128,6 +133,8 @@ check_directory() {
          check_version
          if [[ ! "$VERSION" = "$INSTALLED" ]]; then
              echo -e "${RED}Update required.${WHITE}\n"
+             [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge ../tmp/MonoBleedingEdge
+             rm -rf Bin/Hearthstone_Data
              rm -rf Data
              rm -rf Hearthstone.app
              rm -rf 'Hearthstone Beta Launcher.app'
