@@ -53,7 +53,7 @@ check_version() {
 
     echo -e "${GREEN}Region: ${WHITE}$REGION"
     echo -e "${GREEN}Online version: ${WHITE}$VERSION"
-    echo -e "${GREEN}Downloded version: ${WHITE}$INSTALLED"
+    echo -e "${GREEN}Downloaded version: ${WHITE}$INSTALLED"
 }
 
 download_hearthstone() {
