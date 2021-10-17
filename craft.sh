@@ -17,7 +17,7 @@ set_region(){
  if [ -f ".region" ]; then
    REGION=$(cat .region)
  else
-   read -p "Which region do you wish to install? [EU/US/KR/CN]: " REGION
+   read -p "Which region do you wish to install? [eu/us/kr/cn]: " REGION
    echo $REGION > .region
  fi
 }
