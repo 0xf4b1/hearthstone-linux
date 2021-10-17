@@ -24,7 +24,6 @@ set_region(){
 
 init_hearthstone () {
    mkdir hearthstone && cd hearthstone
-   mkdir tmp
    $NGDP_BIN init
 
    set_region
@@ -66,41 +65,31 @@ download_hearthstone () {
 
 download_unity () {
  echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity 2018.4.10f1 (This is version is required for the game to run).${WHITE}\n"
- [ ! -d "tmp" ] && mkdir -p tmp
+ mkdir -p tmp
  [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/a0470569e97b/LinuxEditorInstaller/Unity.tar.xz
+
+  echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
+  tar -xf tmp/Unity.tar.xz -C tmp Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono/LinuxPlayer Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono/Data/MonoBleedingEdge/
+  UNITY_PATH=tmp/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
+
+  mkdir -p $TARGET_PATH/Bin
+  mv $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
+  mv $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH
+  rm -rf tmp
  echo -e "${GREEN}Done!\n${WHITE}"
 }
 
 move_files_and_cleaup () {
- echo -e "${GREEN}Moving files & running cleanup ...${WHITE}"
- [ ! -d "$TARGET_PATH/Bin" ] && mkdir -p $TARGET_PATH/Bin
+ echo -e "${GREEN}Moving files & running cleanup ...\n${WHITE}"
 
  mv $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
  mv $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
  mv $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
-
- if [ -f "tmp/Unity.tar.xz" ]; then
-   echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
-   tar -xf tmp/Unity.tar.xz -C tmp Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono/LinuxPlayer Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono/Data/MonoBleedingEdge/
-
-   UNITY_PATH=tmp/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
-
-   if [ ! -f "$TARGET_PATH/Bin/Hearthstone.x86_64" ]; then
-     cp $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
-     cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
-   fi
-
-
- fi
-
- if [ -d "tmp/MonoBleedingEdge" ]; then
-   cp -r tmp/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
- fi
+ mv $TARGET_PATH/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
 
  echo -e "${GREEN}Done!\n${WHITE}"
 
- echo -e "${GREEN}Cleaning up unecessary Unity files.${WHITE}\n"
- rm -rf tmp
+ echo -e "${GREEN}Cleaning up unecessary files.${WHITE}\n"
  rm -rf $TARGET_PATH/Hearthstone.app
  rm -rf $TARGET_PATH/'Hearthstone Beta Launcher.app'
 }
@@ -133,7 +122,7 @@ check_directory() {
          check_version
          if [[ ! "$VERSION" = "$INSTALLED" ]]; then
              echo -e "${RED}Update required.${WHITE}\n"
-             [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge ../tmp/MonoBleedingEdge
+             [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge .
              rm -rf Bin/Hearthstone_Data
              rm -rf Data
              rm -rf Hearthstone.app
@@ -142,7 +131,6 @@ check_directory() {
              rm -rf Logs
              download_hearthstone
          fi
-
      fi
      cd ..
      TARGET_PATH=$(realpath hearthstone)
