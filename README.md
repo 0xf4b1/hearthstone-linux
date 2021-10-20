@@ -114,6 +114,9 @@ $ mono token.exe XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
 ```
 </details>
 
+Notice: There is an [issue](https://github.com/0xf4b1/hearthstone-linux/issues/7) if you plan to login with a new account that has not completed the introductions for the different game modes.
+You can either complete them on an official client or apply a patch by replacing `Bin/Hearthstone_Data/Managed/Assembly-CSharp.dll` with [Assembly-CSharp.dll.gz](https://github.com/0xf4b1/hearthstone-linux/files/7382984/Assembly-CSharp.dll.gz).
+
 ### 4) Launch the game!
 
 Launch the game via the desktop entry or directly via the executable.
