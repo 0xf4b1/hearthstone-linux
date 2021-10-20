@@ -102,7 +102,7 @@ gen_token_login() {
 }
 
 create_stubs() {
-    cp client.config $TARGET_PATH
+    sed "s/REGION/${REGION}/" client.config > $TARGET_PATH/client.config
     mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     make -C stubs
     cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
