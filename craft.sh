@@ -58,7 +58,7 @@ download_hearthstone() {
 }
 
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
-UNITY_HUB=/Hub/Editor/2018.4.10f1/$UNITY_ENGINE
+UNITY_HUB=/Hub/Editor/2019.4.21f1/$UNITY_ENGINE
 
 check_unity() {
     if [ -f "$TARGET_PATH/Bin/Hearthstone.x86_64" ]; then
@@ -81,9 +81,9 @@ check_unity() {
 }
 
 download_unity() {
-    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity 2018.4.10f1 (This version is required for the game to run).${WHITE}\n"
+    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity 2019.4.21f1 (This version is required for the game to run).${WHITE}\n"
     mkdir -p tmp
-    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/a0470569e97b/LinuxEditorInstaller/Unity.tar.xz
+    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/b76dac84db26/LinuxEditorInstaller/Unity.tar.xz
 
     echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
     tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/Data/MonoBleedingEdge/
@@ -98,6 +98,7 @@ copy_unity_files() {
     echo -e "${GREEN}Copy Unity files....${WHITE}\n"
     mkdir -p $TARGET_PATH/Bin
     cp $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
+    cp $UNITY_PATH/UnityPlayer.so $TARGET_PATH/Bin/
     cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH
     echo -e "${GREEN}Done!\n${WHITE}"
 }

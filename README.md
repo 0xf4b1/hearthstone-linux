@@ -2,7 +2,7 @@
 
 Craft your own linux native Hearthstone client
 
-*Tested with client version 21.0.3.91040.88998*
+*Updated for client version 21.6.0.124497*
 
 Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
 
@@ -70,7 +70,7 @@ $ ngdp fetch hsb --tags OSX --tags enUS --tags Production
 Install the current version
 
 ```
-$ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
+$ ngdp install hsb 21.6.0.124497 --tags OSX --tags enUS --tags Production
 ```
 </details>
 
@@ -87,7 +87,7 @@ $ ngdp install hsb 18.6.0.63543 --tags OSX --tags enUS --tags Production
 
 * Start Unity Hub with the following url
 
-`$ ./UnityHub.AppImage unityhub://2018.4.10f1/a0470569e97b`
+`$ ./UnityHub.AppImage unityhub://2019.4.21f1/b76dac84db26`
 
 * You can ignore the licensing stuff that may show up, wait until the installation window appears. You don't need to install any of the additional modules.
 
