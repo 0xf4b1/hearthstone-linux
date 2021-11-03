@@ -27,6 +27,23 @@ set_region() {
     echo $REGION >.region
 }
 
+set_locale() {
+    if [ -f ".locale" ]; then
+        REGION=$(cat .locale)
+        return
+    fi
+
+    read -p "Which locale do you wish to install? [deDE/enGB/enUS/esES/esMX/frFR/itIT/jaJP/koKR/plPL/ptBR/ruRU/thTH/zhCN/zhTW]: " LOCALE
+    if [ "${LOCALE}" != "deDE" ] && [ "${LOCALE}" != "enGB" ] && [ "${LOCALE}" != "enUS" ] && [ "${LOCALE}" != "esES" ] \
+        && [ "${LOCALE}" != "esMX" ] && [ "${LOCALE}" != "frFR" ] && [ "${LOCALE}" != "itIT" ] && [ "${LOCALE}" != "jaJP" ] \
+        && [ "${LOCALE}" != "koKR" ] && [ "${LOCALE}" != "plPL" ] && [ "${LOCALE}" != "ptBR" ] && [ "${LOCALE}" != "ruRU" ] \
+        && [ "${LOCALE}" != "thTH" ] && [ "${LOCALE}" != "zhCN" ] && [ "${LOCALE}" != "zhTW" ]; then
+        echo -e "${RED}Invalid Locale. Exiting."
+        exit 1
+    fi
+    echo $LOCALE >.locale
+}
+
 init_hearthstone() {
     mkdir hearthstone && cd hearthstone
     set_region
@@ -36,6 +53,7 @@ init_hearthstone() {
 
 check_version() {
     set_region
+    set_locale
     VERSION=$(curl http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
     VERSION=${VERSION%|*}
     VERSION=${VERSION##*|}
@@ -52,8 +70,8 @@ check_version() {
 
 download_hearthstone() {
     echo -e "${GREEN}Downloading Hearthstone via keg ...${WHITE}\n"
-    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags enUS --tags Production
-    $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags enUS --tags Production
+    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
+    $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
     echo $VERSION >.version
 }
 
@@ -126,7 +144,7 @@ gen_token_login() {
 }
 
 create_stubs() {
-    sed "s/REGION/${REGION}/" client.config > $TARGET_PATH/client.config
+    sed -e "s/REGION/${REGION}/" -e "s/LOCALE/${LOCALE}/" client.config >$TARGET_PATH/client.config
     mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     make -C stubs
     cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
