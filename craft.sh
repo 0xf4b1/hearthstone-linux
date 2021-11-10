@@ -104,7 +104,7 @@ download_unity() {
     [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/b76dac84db26/LinuxEditorInstaller/Unity.tar.xz
 
     echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
-    tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/Data/MonoBleedingEdge/
+    tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
     UNITY_PATH=tmp/$UNITY_ENGINE
     echo -e "${GREEN}Done!\n${WHITE}"
 
