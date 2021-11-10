@@ -1,0 +1,5 @@
+hearthstone/
+login/login
+stubs/CoreFoundation.so
+stubs/libOSXWindowManagement.so
+token/Token.exe
