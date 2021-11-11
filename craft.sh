@@ -29,7 +29,7 @@ set_region() {
 
 set_locale() {
     if [ -f ".locale" ]; then
-        REGION=$(cat .locale)
+        LOCALE=$(cat .locale)
         return
     fi
 
