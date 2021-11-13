@@ -1,12 +1,59 @@
+#include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
+#include <cryptopp/pwdbased.h>
+#include <cryptopp/rijndael.h>
 #include <gtk/gtk.h>
+#include <iostream>
 #include <string>
 #include <webkit2/webkit2.h>
 
-static void destroyWinCb(GtkWidget *widget, GtkWidget *window) { gtk_main_quit(); }
+#define KEY_LENGTH 0x30
 
-static gboolean closeWebCb(WebKitWebView *webView, GtkWidget *window) {
-    gtk_widget_destroy(window);
-    return TRUE;
+using namespace CryptoPP;
+
+typedef unsigned char byte;
+
+void getEncryptionKey(unsigned char *key, int size) {
+    unsigned char s_entropy[16] = {200, 118, 244, 174, 76, 149, 46,  254,
+                                   242, 250, 15,  84,  25, 192, 156, 67};
+    char name[16];
+    getlogin_r(name, sizeof(name));
+
+    int length = strlen(name);
+    for (int i = 0; i < length; i++) {
+        s_entropy[i] ^= name[i];
+    }
+
+    unsigned char salt[] = {'s', 'o', 'm', 'e', 'S', 'a', 'l', 't'};
+    byte unused = 0;
+    PKCS5_PBKDF2_HMAC<SHA1> pbkdf;
+    pbkdf.DeriveKey(key, size, unused, s_entropy, sizeof(s_entropy), salt, sizeof(salt), 1000,
+                    0.0f);
+}
+
+void encrypt(char *token, byte *key, byte *iv, byte *cipher) {
+    try {
+        CBC_Mode<AES>::Encryption e;
+        e.SetKeyWithIV(key, 16, iv);
+        StringSource s(token, true,
+                       new StreamTransformationFilter(e, new ArraySink(cipher, KEY_LENGTH),
+                                                      StreamTransformationFilter::PKCS_PADDING));
+    } catch (const Exception &e) {
+        std::cerr << e.what() << std::endl;
+        exit(1);
+    }
+}
+
+void processToken(char *token) {
+    unsigned char key[16] = {0};
+    getEncryptionKey(key, sizeof(key));
+
+    byte iv[16] = {0};
+    byte cipher[KEY_LENGTH];
+    encrypt(token, key, iv, cipher);
+
+    FILE *file = fopen("token", "wb");
+    fwrite(cipher, sizeof(cipher), 1, file);
 }
 
 static void checkUri(const char *uri) {
@@ -31,10 +78,9 @@ static void checkUri(const char *uri) {
     token[length] = '\0';
 
     if (token[2] == '-' && token[35] == '-') {
-        char cmd[65] = "mono Token.exe ";
-        strcat(cmd, token);
-        system(cmd);
-        // TODO native c++ generate token
+        std::cout << "Found Token: " << token << std::endl;
+        processToken(token);
+        std::cout << "Login successful" << std::endl;
         gtk_main_quit();
     }
 }
@@ -57,6 +103,13 @@ static void web_view_load_changed(WebKitWebView *web_view, WebKitLoadEvent load_
         break;
     }
     }
+}
+
+static void destroyWinCb(GtkWidget *widget, GtkWidget *window) { gtk_main_quit(); }
+
+static gboolean closeWebCb(WebKitWebView *webView, GtkWidget *window) {
+    gtk_widget_destroy(window);
+    return TRUE;
 }
 
 int main(int argc, char *argv[]) {

@@ -6,7 +6,7 @@ all: login
 .PHONY: all
 
 login: login.c
-	$(CC) login.c $(LDFLAGS) $(CFLAGS) -o login 
+	$(CC) login.c -lcryptopp $(LDFLAGS) $(CFLAGS) -o login
 
 clean:
 	rm -rf login
