@@ -14,13 +14,23 @@ Hearthstone is ©2014 Blizzard Entertainment, Inc. All rights reserved. Heroes o
 
 ## Installation
 
-### 1) Clone the repository
+### 1) Preparation
 
-`$ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux`
+On Ubuntu, the following packages are required:
+
+```
+$ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-pip python-is-python3
+```
+
+Then clone the repository:
+
+```
+$ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux
+```
 
 ### 2) Hearthstone installation
 
-Just execute the crafting script. You may need to install some required build files.
+Just execute the crafting script.
 
 ```
 $ ./craft.sh
