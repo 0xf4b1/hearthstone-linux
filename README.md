@@ -16,11 +16,19 @@ Hearthstone is ©2014 Blizzard Entertainment, Inc. All rights reserved. Heroes o
 
 ### 1) Preparation
 
-On Ubuntu, the following packages are required:
+Install the required packages:
 
-```
-$ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-pip python-is-python3
-```
+- Debian/Ubuntu
+
+  ```
+  $ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-pip python-is-python3
+  ```
+
+- Arch Linux/Manjaro
+
+  ```
+  $ sudo pacman -S base-devel crypto++ webkit2gtk git curl wget python python-pip
+  ```
 
 Then clone the repository:
 
