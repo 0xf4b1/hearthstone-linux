@@ -199,6 +199,7 @@ Name=Hearthstone
 Exec=sh -c "cd $TARGET_PATH && ./Bin/Hearthstone.x86_64"
 Icon=$TARGET_PATH/Bin/Hearthstone_Data/Resources/PlayerIcon.icns
 Categories=Game;
+StartupWMClass=Hearthstone.x86_64
 EOF
 
 chmod +x $TARGET_PATH/login
