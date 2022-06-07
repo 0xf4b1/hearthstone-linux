@@ -76,7 +76,9 @@ download_hearthstone() {
 }
 
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
-UNITY_HUB=/Hub/Editor/2019.4.21f1/$UNITY_ENGINE
+UNITY_VER=2019.4.37f1
+UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/019e31cfdb15/LinuxEditorInstaller/Unity.tar.xz
+UNITY_HUB=/Hub/Editor/$UNITY_VER/$UNITY_ENGINE
 
 check_unity() {
     if [ -f "$TARGET_PATH/Bin/Hearthstone.x86_64" ]; then
@@ -99,9 +101,9 @@ check_unity() {
 }
 
 download_unity() {
-    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity 2019.4.21f1 (This version is required for the game to run).${WHITE}\n"
+    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity ${UNITY_VER} (This version is required for the game to run).${WHITE}\n"
     mkdir -p tmp
-    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp https://netstorage.unity3d.com/unity/b76dac84db26/LinuxEditorInstaller/Unity.tar.xz
+    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp $UNITY_INSTALLER_URL
 
     echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
     tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
