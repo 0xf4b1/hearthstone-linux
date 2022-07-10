@@ -1,5 +1,4 @@
 hearthstone/
 login/login
-stubs/CoreFoundation.so
-stubs/libOSXWindowManagement.so
+stubs/*.so
 token/Token.exe
