@@ -2,7 +2,7 @@
 
 Craft your own linux native Hearthstone client
 
-*Updated for client version 21.6.0.124497*
+*Updated for client version 23.6.0.142295*
 
 Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
 
@@ -88,7 +88,7 @@ $ ngdp fetch hsb --tags OSX --tags enUS --tags Production
 Install the current version
 
 ```
-$ ngdp install hsb 21.6.0.124497 --tags OSX --tags enUS --tags Production
+$ ngdp install hsb 23.6.0.142295 --tags OSX --tags enUS --tags Production
 ```
 </details>
 
@@ -133,7 +133,7 @@ $ mono token.exe XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
 </details>
 
 Notice: There is an [issue](https://github.com/0xf4b1/hearthstone-linux/issues/7) if you plan to login with a new account that has not completed the introductions for the different game modes.
-You can either complete them on an official client or apply a patch by replacing `Bin/Hearthstone_Data/Managed/Assembly-CSharp.dll` with [Assembly-CSharp.dll.gz](https://github.com/0xf4b1/hearthstone-linux/files/7382984/Assembly-CSharp.dll.gz).
+The easiest way is to complete them once on an official client.
 
 ### 4) Launch the game!
 
