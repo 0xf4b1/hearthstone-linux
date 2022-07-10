@@ -139,8 +139,6 @@ move_files_and_cleanup() {
 }
 
 gen_token_login() {
-    make -C token
-    cp token/Token.exe $TARGET_PATH
     make -C login
     cp login/login $TARGET_PATH
 }
