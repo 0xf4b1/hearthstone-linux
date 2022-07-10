@@ -9,7 +9,7 @@ WHITE='\e[37m'
 
 setup_keg() {
     cd keg
-    ./setup.py build
+    pip install .
     cd ..
 }
 
