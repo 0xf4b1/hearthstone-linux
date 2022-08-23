@@ -4,6 +4,7 @@
 #include <cryptopp/rijndael.h>
 #include <gtk/gtk.h>
 #include <iostream>
+#include <pwd.h>
 #include <string>
 #include <webkit2/webkit2.h>
 
@@ -16,12 +17,11 @@ typedef unsigned char byte;
 void getEncryptionKey(unsigned char *key, int size) {
     unsigned char s_entropy[16] = {200, 118, 244, 174, 76, 149, 46,  254,
                                    242, 250, 15,  84,  25, 192, 156, 67};
-    char name[16];
-    getlogin_r(name, sizeof(name));
 
-    int length = strlen(name);
+    struct passwd *pwd = getpwuid(getuid());
+    int length = strlen(pwd->pw_name);
     for (int i = 0; i < length; i++) {
-        s_entropy[i] ^= name[i];
+        s_entropy[i] ^= pwd->pw_name[i];
     }
 
     unsigned char salt[] = {'s', 'o', 'm', 'e', 'S', 'a', 'l', 't'};
