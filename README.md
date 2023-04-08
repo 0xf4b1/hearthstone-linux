@@ -1,10 +1,10 @@
 # hearthstone-linux
 
-Craft your own linux native Hearthstone client
+The files in this repository give you the power to craft a Linux-native Hearthstone client. The core game runs perfectly, but the in-game shop remains closed.
 
-*Updated for client version 23.6.0.142295*
-
-Hearthstone is based on the Unity engine, that allows to deploy to multiple platforms, including linux. The platform specific engine files are mostly generic, so let's take the game files and run them with Unity's linux binaries. Taking the windows version does not work, since it was exported only with Direct3D renderer enabled, but the MacOS version uses the OpenGLCore renderer, that we can perfectly use on linux!
+Hearthstone is based on the Unity engine, which allows the game to run on multiple platforms, including Linux.
+The platform-specific engine files are mostly generic, so we take the official game files and run them with Unity's Linux binaries.
+The macOS version of the game uses the OpenGLCore renderer, which we can use perfectly on Linux!
 
 Even though we don't have to modify any of the game internals, please note that this is unofficial and you might risk a ban when using this method.
 
@@ -43,118 +43,100 @@ Just execute the crafting script.
 ```
 $ ./craft.sh
 ```
+<details>
+  <summary>Have a Hearthstone installation from macOS handy?</summary>
 
-If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can specify the path as the first argument and skip the download. If you have Unity files not in `~/Unity`, you can specify the path as second argument.
+If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can specify the path as the first argument and skip the download. If you also have the needed Unity files, but not at the default location `~/Unity`, you can specify the path as second argument.
 
 ```
 $ ./craft.sh [<path of the MacOS installation>] [<Unity path>]
 ```
-
-<details>
-  <summary>Download Hearthstone via keg manually</summary>
-
-To download the required game files, [keg](https://github.com/HearthSim/keg) from the HearthSim project can be used. It's an implementation of Blizzard's NGDP protocol and allows to mirror the contents of the CDN. A slightly modified version is linked into this repository, that allows to download only the needed files for the installation. Use the `ngdp` command from `keg/bin/ngdp`.
-
-Initialize the repository
-
-```
-$ ngdp init
-```
-
-Add the Hearthstone remote
-
-```
-$ ngdp remote add hsb
-```
-
-Update the metadata
-
-```
-$ ngdp fetch hsb --metadata-only
-```
-
-List available versions
-
-```
-$ ngdp inspect hsb
-```
-
-Fetch the game files
-
-```
-$ ngdp fetch hsb --tags OSX --tags enUS --tags Production
-```
-
-Install the current version
-
-```
-$ ngdp install hsb 23.6.0.142295 --tags OSX --tags enUS --tags Production
-```
 </details>
 
-<details>
-  <summary>Download Unity Engine files manually</summary>
+The script will download the game in the `hearthstone` directory, so change to this directory after the script succeeds.
 
-* Download Unity Hub from [here](https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage)
-
-`$ curl -O https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage`
-
-* Make the file executable
-
-`$ chmod +x ./UnityHub.AppImage`
-
-* Start Unity Hub with the following url
-
-`$ ./UnityHub.AppImage unityhub://2019.4.21f1/b76dac84db26`
-
-* You can ignore the licensing stuff that may show up, wait until the installation window appears. You don't need to install any of the additional modules.
-
-By default, it should download the files into your home directory in `~/Unity`.
-</details>
+```
+$ cd hearthstone
+```
 
 ### 3) Login
 
-Use the `login` app to retrieve the authentication token for your account.
-
-<details>
-  <summary>Alternatively retrieve it manually</summary>
-
-Visit the website https://eu.battle.net/login/en/?app=wtcg, enter your account credentials and you will get the authentication token in the browser's address bar via redirection, similarly to this:
+Use the login app inside the `hearthstone` directory to retrieve the authentication token for your account.
 
 ```
-http://localhost:0/?ST=XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
+$ ./login
 ```
 
-Store the token:
-
-```
-$ mono token.exe XX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-XXXXXXXXX
-```
-</details>
-
-Notice: There is an [issue](https://github.com/0xf4b1/hearthstone-linux/issues/7) if you plan to login with a new account that has not completed the introductions for the different game modes.
-The easiest way is to complete them once on an official client.
+If the login was successful, the app will create a `token` file in the current directory.
 
 ### 4) Launch the game!
 
-Launch the game via the desktop entry or directly via the executable.
+Simply launch the game via the desktop entry :)
+
+You can also run it from terminal directly via the executable from within the `hearthstone` directory. It is important that your current working directory is the `hearthstone` directory in which the `token` and `client.config` files are present, otherwise the login will not work!
 
 ```
 $ Bin/Hearthstone.x86_64
 ```
 
-The game runs perfectly besides some features, like the in-game shop, due to missing libraries.
+Notice: There is an [issue](https://github.com/0xf4b1/hearthstone-linux/issues/7) if you have not completed the introductions for the different game modes with your account.
+The animations/videos can't be played, but since newer game versions you don't get stuck anymore and can proceed into the game modes.
 
-<details>
-  <summary>If you are interested what's going on behind the scenes, you can continue reading.</summary>
+## Updating
 
-The `craft.sh` script copies and rearranges the needed files for your linux client and additionally does the following tasks:
+When you start the game, you get a message that a newer version is available?
 
-A file named `client.config` is used by the client for configuration. It will be added with some predefined values, including the option `Aurora.ClientCheck=false` to be able to run the client without the Launcher.
+Just execute the crafting script again.
 
-Since we use the MacOS version, it has some platform specific dependencies we don't have on linux, that prevent the game from launching. The script builds some very simple stubs for the missing libraries, that are `CoreFoundation` and `OSXWindowManagement`.
+```
+$ ./craft.sh
+```
 
-When starting the game client without the Launcher, the game is stuck on the title screen and does not offer something like a login. This happens even on MacOS with the normal installation. But since it tries to read an existing login token from the MacOS registry, the `CoreFoundation` stub is used to provide our manually requested token.
+## FAQ
 
-The game tries to read the authentication token from the registry AES encrypted with some static parameters. Based on that logic, a small token tool will be built that encrypts a provided webtoken and stores it in a file named `token`, where the `CoreFoundation` stub reads it from.
-</details>
+> Closed
+>
+> The game was unable to log you in through the Blizzard services. Please wait a few minutes and try again.
+
+> Closed
+>
+> Oops! Playful sprites have disrupted Hearthstone as it was connecting to our servers. Please wait a few minutes for them to disperse and try again later.
+
+These two messages usually appear when something is wrong with your login token or the way you start the game.
+
+- Did you forget to log in?
+
+Please make sure the file `token` is present inside the `hearthstone` directory.
+
+- Running from terminal?
+
+Please make sure you are in the `hearthstone` directory in which the `token` and `client.config` files are present.
+
+- Did you created the token with a different user?
+
+The `token` is associated with the username that created it, so you will need to log in again with your new user.
+
+> Updating to a newer version takes more time and bandwidth
+
+To download the game files we use `keg`. It is not a full-fledged client and does not support actual patching of the game. Instead, it downloads each changed file again to bring the game up to date.
+
+> The hearthstone directory consumes a lot of disk space
+
+To download the game files, we use `keg`. It downloads all files in the `hearthstone/.ngdp` directory from which it creates the Hearthstone installation.
+When updating, it downloads all changed files and reuses old files to bring the game to the latest state.
+Since old files are never removed, it can consume a lot of space. However, if we would clean up the directory entirely, we would have to re-download the full game with every update.
+
+If you have other issues, have a look through the [existing issues](https://github.com/0xf4b1/hearthstone-linux/issues?q=) and if that does not help create a [new issue](https://github.com/0xf4b1/hearthstone-linux/issues/new).
+Don't forget to add logs from `Bin/Logs/` that might be helpful for troubleshooting.
+
+## How does it work?
+
+The `craft.sh` script copies and rearranges the needed files for your Linux client and additionally does the following tasks:
+
+A file named `client.config` is used by the client for configuration. It will be added with some predefined values, including the option `Aurora.ClientCheck=false` to be able to run the client without the official launcher.
+
+The macOS version has some platform-specific dependencies that we don't have on Linux and prevent the game from launching. The script builds some very simple stubs for the missing libraries, namely `CoreFoundation` and `OSXWindowManagement`.
+
+When the game client is started without the launcher, the game hangs on the title screen and offers no login. This happens even on macOS with the normal installation. But since it tries to read an existing login token from the macOS registry, the `CoreFoundation` stub is used to provide our manually requested token.
+
+The game tries to read the authentication token from the registry AES encrypted with some static parameters. Based on that logic, a small login tool will be built that encrypts and stores it in a file named `token` from which the `CoreFoundation` stub reads it.
