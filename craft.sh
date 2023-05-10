@@ -54,7 +54,7 @@ init_hearthstone() {
 check_version() {
     set_region
     set_locale
-    VERSION=$(curl http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
+    VERSION=$(curl -s http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
     VERSION=${VERSION%|*}
     VERSION=${VERSION##*|}
 
@@ -75,9 +75,9 @@ download_hearthstone() {
     echo $VERSION >.version
 }
 
-UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_withgfx_nondevelopment_mono
-UNITY_VER=2019.4.37f1
-UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/019e31cfdb15/LinuxEditorInstaller/Unity.tar.xz
+UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_mono
+UNITY_VER=2021.3.19f1
+UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/c9714fde33b6/LinuxEditorInstaller/Unity.tar.xz
 UNITY_HUB=/Hub/Editor/$UNITY_VER/$UNITY_ENGINE
 
 check_unity() {
