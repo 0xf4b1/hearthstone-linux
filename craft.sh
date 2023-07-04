@@ -76,8 +76,8 @@ download_hearthstone() {
 }
 
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_mono
-UNITY_VER=2021.3.19f1
-UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/c9714fde33b6/LinuxEditorInstaller/Unity.tar.xz
+UNITY_VER=2021.3.25f1
+UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/68ef2c4f8861/LinuxEditorInstaller/Unity.tar.xz
 UNITY_HUB=/Hub/Editor/$UNITY_VER/$UNITY_ENGINE
 
 check_unity() {
