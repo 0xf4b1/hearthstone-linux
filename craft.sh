@@ -70,10 +70,23 @@ check_version() {
 
 download_hearthstone() {
     echo -e "${GREEN}Downloading Hearthstone via keg ...${WHITE}\n"
-    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
-    $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
+
+    # Start downloading in the background
+    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production &
+
+    DOWNLOAD_PID=$!
+
+    # Start installation in the background
+    $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production &
+
+    INSTALL_PID=$!
+
+    # Wait for both processes to complete
+    wait $DOWNLOAD_PID $INSTALL_PID
+
     echo $VERSION >.version
 }
+
 
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_mono
 UNITY_VER=2021.3.25f1
@@ -100,42 +113,58 @@ check_unity() {
     fi
 }
 
-download_unity() {
-    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity ${UNITY_VER} (This version is required for the game to run).${WHITE}\n"
-    mkdir -p tmp
-    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp $UNITY_INSTALLER_URL
-
-    echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
-    tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
-    UNITY_PATH=tmp/$UNITY_ENGINE
-    echo -e "${GREEN}Done!\n${WHITE}"
-
-    copy_unity_files
-    rm -rf tmp
+download_unity() {     
+    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity ${UNITY_VER} (This version is required for the game to run).${WHITE}\n"     
+    mkdir -p tmp     
+    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp $UNITY_INSTALLER_URL &     
+    UNITY_DOWNLOAD_PID=$!     
+    echo -e "${GREEN}Extracting Unity files....${WHITE}\n"     
+    wait $UNITY_DOWNLOAD_PID && tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/ &     
+    UNITY_EXTRACT_PID=$!     
+    wait $UNITY_EXTRACT_PID     
+    UNITY_PATH=tmp/$UNITY_ENGINE     
+    echo -e "${GREEN}Done!\n${WHITE}"      
+    copy_unity_files     
+    rm -rf tmp 
 }
 
+
 copy_unity_files() {
+    local unity_files=(
+        "LinuxPlayer"
+        "UnityPlayer.so"
+        "Data/MonoBleedingEdge"
+    )
+
     echo -e "${GREEN}Copy Unity files....${WHITE}\n"
     mkdir -p $TARGET_PATH/Bin
-    cp $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
-    cp $UNITY_PATH/UnityPlayer.so $TARGET_PATH/Bin/
-    cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH
+
+    for file in ${unity_files[@]}; do
+        cp "$UNITY_PATH/$file" "$TARGET_PATH/Bin/"
+    done
+
     echo -e "${GREEN}Done!\n${WHITE}"
 }
 
 move_files_and_cleanup() {
+    local files_to_move=(
+        "Hearthstone.app/Contents/Resources/Data"
+        "Hearthstone.app/Contents/Resources/'unity default resources'"
+        "Hearthstone.app/Contents/Resources/PlayerIcon.icns"
+        "MonoBleedingEdge"
+    )
+
     echo -e "${GREEN}Moving files & running cleanup ...\n${WHITE}"
 
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
-    mv $TARGET_PATH/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
+    for file in ${files_to_move[@]}; do
+        mv "$TARGET_PATH/$file" "$TARGET_PATH/Bin/Hearthstone_Data"
+    done
 
     echo -e "${GREEN}Done!\n${WHITE}"
 
     echo -e "${GREEN}Cleaning up unecessary files.${WHITE}\n"
-    rm -rf $TARGET_PATH/Hearthstone.app
-    rm -rf $TARGET_PATH/'Hearthstone Beta Launcher.app'
+
+    rm -rf $TARGET_PATH/{Hearthstone.app,'Hearthstone Beta Launcher.app'}
 }
 
 gen_token_login() {
@@ -144,13 +173,21 @@ gen_token_login() {
 }
 
 create_stubs() {
+    local files_to_copy=(
+        "stubs/CoreFoundation.so"
+        "stubs/libOSXWindowManagement.so"
+        "stubs/libblz_commerce_sdk_plugin.so"
+    )
+
     sed -e "s/REGION/${REGION}/" -e "s/LOCALE/${LOCALE}/" client.config >$TARGET_PATH/client.config
     mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     make -C stubs
-    cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
-    cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
-    cp stubs/libblz_commerce_sdk_plugin.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
+
+    for file in ${files_to_copy[@]}; do
+        cp "$file" "$TARGET_PATH/Bin/Hearthstone_Data/Plugins"
+    done
 }
+
 
 check_directory() {
     if [ $1 ]; then
@@ -174,14 +211,15 @@ check_directory() {
     if [[ ! "$VERSION" = "$INSTALLED" ]]; then
         echo -e "${RED}Update required.${WHITE}\n"
         [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge .
-        rm -rf Bin/Hearthstone_Data
-        rm -rf Data
-        rm -rf Hearthstone.app
-        rm -rf 'Hearthstone Beta Launcher.app'
-        rm -rf Strings
-        rm -rf Logs
+
+        directories_to_remove=("Bin/Hearthstone_Data" "Data" "Hearthstone.app" "'Hearthstone Beta Launcher.app'" "Strings" "Logs")
+        for dir in ${directories_to_remove[@]}; do
+            rm -rf $dir
+        done
+
         download_hearthstone
     fi
+
 
     cd ..
     TARGET_PATH=$(realpath hearthstone)
