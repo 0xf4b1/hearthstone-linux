@@ -7,10 +7,16 @@ GREEN='\e[32m'
 RED='\e[31m'
 WHITE='\e[37m'
 
-setup_keg() {
-    cd keg
-    pip install .
-    cd ..
+ensure_keg() {
+    if [ ! -d venv ]; then
+      python -m venv venv
+      source venv/bin/activate
+      pushd keg
+      pip install .
+      popd
+    fi
+    source venv/bin/activate
+    $NGDP_BIN --help || echo "keg is not working"; exit -1
 }
 
 set_region() {
@@ -45,7 +51,7 @@ set_locale() {
 }
 
 init_hearthstone() {
-    mkdir hearthstone && cd hearthstone
+    mkdir hearthstone && pushd hearthstone
     set_region
     $NGDP_BIN init
     $NGDP_BIN remote add http://${REGION}.patch.battle.net:1119/hsb
@@ -160,13 +166,14 @@ check_directory() {
         return
     fi
 
+    ensure_keg
+
     # Managed Hearthstone installation via keg
     if [ ! -d hearthstone ]; then
         echo -e "${RED}Hearthstone installation not found${WHITE}\n"
-        setup_keg
         init_hearthstone
     else
-        cd hearthstone
+        pushd hearthstone
     fi
 
     # Update procedure
@@ -183,7 +190,7 @@ check_directory() {
         download_hearthstone
     fi
 
-    cd ..
+    popd
     TARGET_PATH=$(realpath hearthstone)
 }
 
