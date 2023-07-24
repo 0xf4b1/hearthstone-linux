@@ -3,12 +3,30 @@
 set -e
 
 NGDP_BIN=$(realpath keg/bin/ngdp)
-GREEN='\e[32m'
 RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
 WHITE='\e[37m'
+
+print() {
+    printf "$1$2\n${WHITE}"
+}
+
+info() {
+    print $GREEN "$1"
+}
+
+warn() {
+    print $YELLOW "$1"
+}
+
+error() {
+    print $RED "$1"
+}
 
 ensure_keg() {
     if [ ! -d venv ]; then
+      info "Creating python venv for keg ..."
       python -m venv venv
       source venv/bin/activate
       pushd keg
@@ -16,7 +34,7 @@ ensure_keg() {
       popd
     fi
     source venv/bin/activate
-    $NGDP_BIN --help || echo "keg is not working"; exit -1
+    $NGDP_BIN --help >/dev/null || (error "keg is not working" && exit 1)
 }
 
 set_region() {
@@ -27,7 +45,7 @@ set_region() {
 
     read -p "Which region do you wish to install? [eu/us/kr/cn]: " REGION
     if [ "${REGION}" != "eu" ] && [ "${REGION}" != "us" ] && [ "${REGION}" != "kr" ] && [ "${REGION}" != "cn" ]; then
-        echo -e "${RED}Invalid Region. Exiting."
+        error "Invalid Region. Exiting."
         exit 1
     fi
     echo $REGION >.region
@@ -44,7 +62,7 @@ set_locale() {
         && [ "${LOCALE}" != "esMX" ] && [ "${LOCALE}" != "frFR" ] && [ "${LOCALE}" != "itIT" ] && [ "${LOCALE}" != "jaJP" ] \
         && [ "${LOCALE}" != "koKR" ] && [ "${LOCALE}" != "plPL" ] && [ "${LOCALE}" != "ptBR" ] && [ "${LOCALE}" != "ruRU" ] \
         && [ "${LOCALE}" != "thTH" ] && [ "${LOCALE}" != "zhCN" ] && [ "${LOCALE}" != "zhTW" ]; then
-        echo -e "${RED}Invalid Locale. Exiting."
+        error "Invalid Locale. Exiting."
         exit 1
     fi
     echo $LOCALE >.locale
@@ -69,29 +87,39 @@ check_version() {
         INSTALLED=$(cat .version)
     fi
 
-    echo -e "${GREEN}Region: ${WHITE}$REGION"
-    echo -e "${GREEN}Online version: ${WHITE}$VERSION"
-    echo -e "${GREEN}Downloaded version: ${WHITE}$INSTALLED"
+    info "Region: $REGION"
+    info "Online version: $VERSION"
+    info "Installed version: $INSTALLED"
 }
 
 download_hearthstone() {
-    echo -e "${GREEN}Downloading Hearthstone via keg ...${WHITE}\n"
+    info "Downloading Hearthstone via keg ..."
     $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
     $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
     echo $VERSION >.version
 }
 
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_mono
-UNITY_VER=2021.3.25f1
-UNITY_INSTALLER_URL=https://download.unity3d.com/download_unity/68ef2c4f8861/LinuxEditorInstaller/Unity.tar.xz
-UNITY_HUB=/Hub/Editor/$UNITY_VER/$UNITY_ENGINE
 
 check_unity() {
-    if [ -f "$TARGET_PATH/Bin/Hearthstone.x86_64" ]; then
+    UNITY_VER=`strings "Hearthstone.app/Contents/Resources/Data/level0" | head -n 1`
+    [ -z "$UNITY_VER" ] && error "Can not determine required Unity version!" && exit 1
+    UNITY_INSTALLED="Not installed"
+    if [ -f ".unity" ]; then
+        UNITY_INSTALLED=$(cat .unity)
+    fi
+
+    info "Required Unity version: $UNITY_VER"
+    info "Installed Unity version: $UNITY_INSTALLED"
+
+    if [[ "$UNITY_VER" = "$UNITY_INSTALLED" ]]; then
         # Unity files are present already in case of updating
         return
     fi
 
+    warn "Update required."
+    rm -rf MonoBleedingEdge
+    UNITY_HUB=/Hub/Editor/$UNITY_VER/$UNITY_ENGINE
     if [ $1 ]; then
         # Unity files supplied via second argument
         UNITY_PATH=$1$UNITY_HUB
@@ -107,41 +135,47 @@ check_unity() {
 }
 
 download_unity() {
-    echo -e "${RED}Unity files not found.\n${GREEN}Downloading Unity ${UNITY_VER} (This version is required for the game to run).${WHITE}\n"
     mkdir -p tmp
-    [ ! -f "tmp/Unity.tar.xz" ] && wget -P tmp $UNITY_INSTALLER_URL
+    pushd tmp
 
-    echo -e "${GREEN}Extracting Unity files....${WHITE}\n"
-    tar -xf tmp/Unity.tar.xz -C tmp $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
-    UNITY_PATH=tmp/$UNITY_ENGINE
-    echo -e "${GREEN}Done!\n${WHITE}"
+    info "Fetching Unity archive ..."
+    curl -s https://unity.com/releases/editor/archive -o archive
+    res=`cat archive | grep unityhub://$UNITY_VER` || (error "Unity version not found in archive" && exit 1)
 
+    info "Downloading Unity files ..."
+    HASH=${res##*$UNITY_VER/}
+    HASH=${HASH%%\"*}
+    curl https://download.unity3d.com/download_unity/$HASH/LinuxEditorInstaller/Unity.tar.xz -o Unity.tar.xz || (error "Could not fetch Unity archive" && exit 1)
+
+    info "Extracting Unity files ..."
+    tar -xf Unity.tar.xz $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
+    UNITY_PATH=$PWD/$UNITY_ENGINE
+
+    popd
     copy_unity_files
     rm -rf tmp
 }
 
 copy_unity_files() {
-    echo -e "${GREEN}Copy Unity files....${WHITE}\n"
-    mkdir -p $TARGET_PATH/Bin
-    cp $UNITY_PATH/LinuxPlayer $TARGET_PATH/Bin/Hearthstone.x86_64
-    cp $UNITY_PATH/UnityPlayer.so $TARGET_PATH/Bin/
-    cp -r $UNITY_PATH/Data/MonoBleedingEdge $TARGET_PATH
-    echo -e "${GREEN}Done!\n${WHITE}"
+    info "Copy Unity files ..."
+    mkdir -p Bin
+    cp $UNITY_PATH/LinuxPlayer Bin/Hearthstone.x86_64
+    cp $UNITY_PATH/UnityPlayer.so Bin/
+    cp -r $UNITY_PATH/Data/MonoBleedingEdge .
+    echo $UNITY_VER >.unity
 }
 
 move_files_and_cleanup() {
-    echo -e "${GREEN}Moving files & running cleanup ...\n${WHITE}"
+    info "Moving files & running cleanup ..."
 
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/Data $TARGET_PATH/Bin/Hearthstone_Data
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/'unity default resources' $TARGET_PATH/Bin/Hearthstone_Data/Resources
-    mv $TARGET_PATH/Hearthstone.app/Contents/Resources/PlayerIcon.icns $TARGET_PATH/Bin/Hearthstone_Data/Resources
-    mv $TARGET_PATH/MonoBleedingEdge $TARGET_PATH/Bin/Hearthstone_Data
+    mv Hearthstone.app/Contents/Resources/Data Bin/Hearthstone_Data
+    mv Hearthstone.app/Contents/Resources/'unity default resources' Bin/Hearthstone_Data/Resources
+    mv Hearthstone.app/Contents/Resources/PlayerIcon.icns Bin/Hearthstone_Data/Resources
+    mv MonoBleedingEdge Bin/Hearthstone_Data
 
-    echo -e "${GREEN}Done!\n${WHITE}"
-
-    echo -e "${GREEN}Cleaning up unecessary files.${WHITE}\n"
-    rm -rf $TARGET_PATH/Hearthstone.app
-    rm -rf $TARGET_PATH/'Hearthstone Beta Launcher.app'
+    info "Cleaning up unecessary files ..."
+    rm -rf Hearthstone.app
+    rm -rf 'Hearthstone Beta Launcher.app'
 }
 
 gen_token_login() {
@@ -162,7 +196,8 @@ check_directory() {
     if [ $1 ]; then
         # User-specified Hearthstone installation
         set_region
-        TARGET_PATH=$(realpath $1)
+        pushd $1
+        TARGET_PATH=$PWD
         return
     fi
 
@@ -170,7 +205,7 @@ check_directory() {
 
     # Managed Hearthstone installation via keg
     if [ ! -d hearthstone ]; then
-        echo -e "${RED}Hearthstone installation not found${WHITE}\n"
+        warn "Hearthstone installation not found"
         init_hearthstone
     else
         pushd hearthstone
@@ -179,7 +214,7 @@ check_directory() {
     # Update procedure
     check_version
     if [[ ! "$VERSION" = "$INSTALLED" ]]; then
-        echo -e "${RED}Update required.${WHITE}\n"
+        warn "Update required."
         [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge .
         rm -rf Bin/Hearthstone_Data
         rm -rf Data
@@ -190,13 +225,13 @@ check_directory() {
         download_hearthstone
     fi
 
-    popd
-    TARGET_PATH=$(realpath hearthstone)
+    TARGET_PATH=$PWD
 }
 
 check_directory $1
 check_unity $2
 move_files_and_cleanup
+popd
 gen_token_login
 create_stubs
 
@@ -210,6 +245,5 @@ Categories=Game;
 StartupWMClass=Hearthstone.x86_64
 EOF
 
-chmod +x $TARGET_PATH/login
-chmod +x $TARGET_PATH/Bin/Hearthstone.x86_64
-echo -e "\n${GREEN}Done. Now generate your web token, before launching the game!${WHITE}"
+info "Done."
+[ -f "$TARGET_PATH/token" ] || (warn "Please create your login token before launching the game!" && $TARGET_PATH/login)
