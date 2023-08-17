@@ -21,13 +21,13 @@ Install the required packages:
 - Debian/Ubuntu
 
   ```
-  $ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-pip python-is-python3
+  $ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-venv python-is-python3
   ```
 
 - Arch Linux/Manjaro
 
   ```
-  $ sudo pacman -S base-devel crypto++ webkit2gtk git curl wget python python-pip
+  $ sudo pacman -S base-devel crypto++ webkit2gtk git curl wget python python-virtualenv
   ```
 
 Then clone the repository:
