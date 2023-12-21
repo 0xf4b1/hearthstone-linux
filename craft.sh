@@ -240,7 +240,7 @@ cat <<EOF >~/.local/share/applications/hearthstone.desktop
 Type=Application
 Name=Hearthstone
 Path=$TARGET_PATH
-Exec=./Bin/Hearthstone.x86_64"
+Exec=Bin/Hearthstone.x86_64
 Icon=$TARGET_PATH/Bin/Hearthstone_Data/Resources/PlayerIcon.icns
 Categories=Game;
 StartupWMClass=Hearthstone.x86_64
