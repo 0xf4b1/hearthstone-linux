@@ -121,6 +121,7 @@ int main(int argc, char *argv[]) {
     win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_default_size(GTK_WINDOW(win), 480, 420);
     gtk_window_set_position(GTK_WINDOW(win), GTK_WIN_POS_CENTER);
+    gtk_window_set_title(GTK_WINDOW(win), "Battle.net Login");
 
     web = WEBKIT_WEB_VIEW(webkit_web_view_new());
     gtk_container_add(GTK_CONTAINER(win), GTK_WIDGET(web));
