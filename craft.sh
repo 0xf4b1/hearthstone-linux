@@ -223,6 +223,9 @@ check_directory() {
         rm -rf Strings
         rm -rf Logs
         download_hearthstone
+    else
+        info "Everything up-to-date."
+        exit 0
     fi
 
     TARGET_PATH=$PWD
