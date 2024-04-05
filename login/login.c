@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
     gtk_window_set_position(GTK_WINDOW(win), GTK_WIN_POS_CENTER);
     gtk_window_set_title(GTK_WINDOW(win), "Battle.net Login");
 
-    icon = gdk_pixbuf_new_from_file("./Bin/Hearthstone_Data/Resources/PlayerIcon.icns", NULL);
+    icon = gdk_pixbuf_new_from_file("../hearthstone/Bin/Hearthstone_Data/Resources/PlayerIcon.icns", NULL);
     gtk_window_set_icon(GTK_WINDOW(win), icon);
 
     web = WEBKIT_WEB_VIEW(webkit_web_view_new());
