@@ -21,19 +21,19 @@ Install the required packages:
 - Debian/Ubuntu
 
   ```
-  $ sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-venv python-is-python3
+  sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.0-dev git curl wget python3 python3-venv python-is-python3
   ```
 
 - Arch Linux/Manjaro
 
   ```
-  $ sudo pacman -S base-devel crypto++ webkit2gtk git curl wget python python-virtualenv
+  sudo pacman -S base-devel crypto++ webkit2gtk git curl wget python python-virtualenv
   ```
 
 Then clone the repository:
 
 ```
-$ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux
+git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd hearthstone-linux
 ```
 
 ### 2) Hearthstone installation
@@ -41,7 +41,7 @@ $ git clone --recursive https://github.com/0xf4b1/hearthstone-linux.git && cd he
 Just execute the crafting script.
 
 ```
-$ ./craft.sh
+./craft.sh
 ```
 <details>
   <summary>Have a Hearthstone installation from macOS handy?</summary>
@@ -49,14 +49,14 @@ $ ./craft.sh
 If you have an up-to-date Hearthstone installation folder from your Mac `/Applications/Hearthstone` somewhere in place, you can specify the path as the first argument and skip the download. If you also have the needed Unity files, but not at the default location `~/Unity`, you can specify the path as second argument.
 
 ```
-$ ./craft.sh [<path of the MacOS installation>] [<Unity path>]
+./craft.sh [<path of the MacOS installation>] [<Unity path>]
 ```
 </details>
 
 The script will download the game in the `hearthstone` directory, so change to this directory after the script succeeds.
 
 ```
-$ cd hearthstone
+cd hearthstone
 ```
 
 ### 3) Login
@@ -64,7 +64,7 @@ $ cd hearthstone
 Use the login app inside the `hearthstone` directory to retrieve the authentication token for your account.
 
 ```
-$ ./login
+./login
 ```
 
 If the login was successful, the app will create a `token` file in the current directory.
@@ -76,7 +76,7 @@ Simply launch the game via the desktop entry :)
 You can also run it from terminal directly via the executable from within the `hearthstone` directory. It is important that your current working directory is the `hearthstone` directory in which the `token` and `client.config` files are present, otherwise the login will not work!
 
 ```
-$ Bin/Hearthstone.x86_64
+Bin/Hearthstone.x86_64
 ```
 
 Notice: There is an [issue](https://github.com/0xf4b1/hearthstone-linux/issues/7) if you have not completed the introductions for the different game modes with your account.
@@ -89,7 +89,7 @@ When you start the game, you get a message that a newer version is available?
 Just execute the crafting script again.
 
 ```
-$ ./craft.sh
+./craft.sh
 ```
 
 ## FAQ
