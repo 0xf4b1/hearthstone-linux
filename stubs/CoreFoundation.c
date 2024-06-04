@@ -24,7 +24,7 @@ intptr_t CFDataGetBytePtr(intptr_t data) {
   fread(buffer, KEY_LENGTH, 1, fd);
   fclose(fd);
 
-  return buffer;
+  return (intptr_t) buffer;
 }
 
 unsigned int CFDataGetLength(intptr_t theData) { return KEY_LENGTH; }
