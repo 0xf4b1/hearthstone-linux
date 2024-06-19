@@ -139,15 +139,16 @@ download_unity() {
     pushd tmp
 
     info "Fetching Unity archive ..."
-    curl -s https://unity.com/releases/editor/archive -o archive
-    res=`cat archive | grep unityhub://$UNITY_VER` || (error "Unity version not found in archive" && exit 1)
+    curl -s https://unity.com/releases/editor/archive -o archive || (error "Could not fetch Unity archive" && exit 1)
 
-    info "Downloading Unity files ..."
-    HASH=${res##*$UNITY_VER/}
-    HASH=${HASH%%\"*}
-    curl https://download.unity3d.com/download_unity/$HASH/LinuxEditorInstaller/Unity.tar.xz -o Unity.tar.xz || (error "Could not fetch Unity archive" && exit 1)
+    EXP="(?<=$UNITY_VER/)[^\\\]*"
+    HASH=`grep -oP $EXP archive` || (error "Unity version not found in archive" && exit 1)
+    URL="https://download.unity3d.com/download_unity/${HASH%%$'\n'*}/LinuxEditorInstaller/Unity.tar.xz"
 
-    info "Extracting Unity files ..."
+    info "Downloading Unity from $URL ..."
+    curl $URL -o Unity.tar.xz || (error "Could not download Unity" && exit 1)
+
+    info "Extracting Unity ..."
     tar -xf Unity.tar.xz $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
     UNITY_PATH=$PWD/$UNITY_ENGINE
 
