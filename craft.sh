@@ -102,7 +102,7 @@ download_hearthstone() {
 UNITY_ENGINE=Editor/Data/PlaybackEngines/LinuxStandaloneSupport/Variations/linux64_player_nondevelopment_mono
 
 check_unity() {
-    UNITY_VER=`strings "Hearthstone.app/Contents/Resources/Data/level0" | head -n 1`
+    UNITY_VER=`strings "Bin/Hearthstone_Data/level0" | head -n 1`
     [ -z "$UNITY_VER" ] && error "Can not determine required Unity version!" && exit 1
     UNITY_INSTALLED="Not installed"
     if [ -f ".unity" ]; then
@@ -114,6 +114,7 @@ check_unity() {
 
     if [[ "$UNITY_VER" = "$UNITY_INSTALLED" ]]; then
         # Unity files are present already in case of updating
+        [ -d "MonoBleedingEdge" ] && mv MonoBleedingEdge Bin/Hearthstone_Data
         return
     fi
 
@@ -159,38 +160,41 @@ download_unity() {
 
 copy_unity_files() {
     info "Copy Unity files ..."
-    mkdir -p Bin
     cp $UNITY_PATH/LinuxPlayer Bin/Hearthstone.x86_64
     cp $UNITY_PATH/UnityPlayer.so Bin/
-    cp -r $UNITY_PATH/Data/MonoBleedingEdge .
+    cp -r $UNITY_PATH/Data/MonoBleedingEdge Bin/Hearthstone_Data
     echo $UNITY_VER >.unity
 }
 
-move_files_and_cleanup() {
-    info "Moving files & running cleanup ..."
+transform_installation() {
+    if [ ! -d Hearthstone.app ]; then
+        # Installation already transformed
+        return
+    fi
+    info "Transform installation ..."
 
+    mkdir -p Bin
     mv Hearthstone.app/Contents/Resources/Data Bin/Hearthstone_Data
     mv Hearthstone.app/Contents/Resources/'unity default resources' Bin/Hearthstone_Data/Resources
     mv Hearthstone.app/Contents/Resources/PlayerIcon.icns Bin/Hearthstone_Data/Resources
-    mv MonoBleedingEdge Bin/Hearthstone_Data
 
-    info "Cleaning up unecessary files ..."
     rm -rf Hearthstone.app
     rm -rf 'Hearthstone Beta Launcher.app'
 }
 
-gen_token_login() {
-    make -C login
-    cp login/login $TARGET_PATH
-}
+create_compatibility_files() {
+    info "Create compatibility files ..."
 
-create_stubs() {
     sed -e "s/REGION/${REGION}/" -e "s/LOCALE/${LOCALE}/" client.config >$TARGET_PATH/client.config
+
     mkdir -p $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     make -C stubs
     cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
     cp stubs/libblz_commerce_sdk_plugin.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
+
+    make -C login
+    cp login/login $TARGET_PATH
 }
 
 check_directory() {
@@ -223,20 +227,16 @@ check_directory() {
         rm -rf Logs
         rm -rf BlizzardBrowser
         download_hearthstone
-    else
-        info "Everything up-to-date."
-        exit 0
     fi
 
     TARGET_PATH=$PWD
 }
 
 check_directory $1
+transform_installation
 check_unity $2
-move_files_and_cleanup
 popd
-gen_token_login
-create_stubs
+create_compatibility_files
 
 cat <<EOF >~/.local/share/applications/hearthstone.desktop
 [Desktop Entry]
