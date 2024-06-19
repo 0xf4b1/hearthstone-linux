@@ -218,10 +218,9 @@ check_directory() {
         [ -d "Bin/Hearthstone_Data/MonoBleedingEdge" ] && mv Bin/Hearthstone_Data/MonoBleedingEdge .
         rm -rf Bin/Hearthstone_Data
         rm -rf Data
-        rm -rf Hearthstone.app
-        rm -rf 'Hearthstone Beta Launcher.app'
         rm -rf Strings
         rm -rf Logs
+        rm -rf BlizzardBrowser
         download_hearthstone
     else
         info "Everything up-to-date."
