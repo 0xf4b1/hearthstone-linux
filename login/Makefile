@@ -5,9 +5,9 @@ LDFLAGS = `pkg-config  --libs gtk+-3.0 webkit2gtk-4.0`
 all: login
 .PHONY: all
 
-login: login.c
-	$(CC) login.c -lcryptopp $(LDFLAGS) $(CFLAGS) -o login
+login: login.cpp
+	$(CC) login.cpp -lcryptopp $(LDFLAGS) $(CFLAGS) -o login
 
 clean:
-	rm -rf login
+	rm login
 .PHONY: clean
