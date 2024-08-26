@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include/c++/12",
+                "/usr/include/x86_64-linux-gnu/c++/12",
+                "/usr/include/c++/12/backward",
+                "/usr/lib/gcc/x86_64-linux-gnu/12/include",
+                "/usr/local/include",
+                "/usr/include/x86_64-linux-gnu",
+                "/usr/include",
+                "${workspaceFolder}/**",
+                "/usr/include/gtk-3.0",
+                "/usr/include/webkitgtk-4.0",
+                "/usr/include/glib-2.0",
+                "/usr/include/libsoup-2.4",
+                "/usr/include/cairo",
+                "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+                "/usr/include/pango-1.0",
+                "/usr/include/harfbuzz",
+                "/usr/include/gdk-pixbuf-2.0",
+                "/usr/include/atk-1.0"
+            ],
+            "defines": [],
+            "cStandard": "c99",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "macos-gcc-x64",
+            "compilerArgs": [],
+            "compilerPath": "/usr/bin/g++"
+        }
+    ],
+    "version": 4
+}

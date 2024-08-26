@@ -1,0 +1,14 @@
+{
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "string_view": "c"
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++",
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.default.compilerArgs": [
+        "lcryptopp"
+    ],
+    "C_Cpp.default.cppStandard": "c++14",
+    "C_Cpp.default.cStandard": "c99",
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-x64"
+}
