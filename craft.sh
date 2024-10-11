@@ -80,7 +80,7 @@ check_version() {
     set_locale
     # when region is cn, change the url into  https://cn.version.battlenet.com.cn/hsb/versions
     if [ "${REGION}" = "cn" ]; then
-        VERSION=$(curl -s https://cn.version.battle.net/hsb/versions | grep cn)
+        VERSION=$(curl -s https://cn.version.battlenet.com.cn/hsb/versions | grep cn)
     else
         VERSION=$(curl -s http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
     fi
