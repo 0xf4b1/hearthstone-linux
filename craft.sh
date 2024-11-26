@@ -238,6 +238,8 @@ check_unity $2
 popd
 create_compatibility_files
 
+mkdir -p ~/.local/share/applications
+
 cat <<EOF >~/.local/share/applications/hearthstone.desktop
 [Desktop Entry]
 Type=Application
