@@ -145,11 +145,15 @@ download_unity() {
     pushd tmp
 
     info "Fetching Unity archive ..."
-    curl -s https://unity.com/releases/editor/archive -o archive || (error "Could not fetch Unity archive" && exit 1)
 
-    EXP="(?<=$UNITY_VER/)[^\\\]*"
-    HASH=`grep -oP $EXP archive` || (error "Unity version not found in archive" && exit 1)
-    URL="https://download.unity3d.com/download_unity/${HASH%%$'\n'*}/LinuxEditorInstaller/Unity.tar.xz"
+    # Use GraphQL endpoint to retrieve archive hash
+    curl --silent --json '{"operationName":"GetRelease","variables":{"version":"'$UNITY_VER'","limit":300},"query":"query GetRelease($limit: Int, $skip: Int, $version: String!, $stream: [UnityReleaseStream!]) {\n getUnityReleases(\nlimit: $limit\nskip: $skip\nstream: $stream\nversion: $version\nentitlements: [XLTS]\n ) {\ntotalCount\nedges {\n node {\n version\n entitlements\n releaseDate\n unityHubDeepLink\n stream\n __typename\n }\n __typename\n}\n__typename\n }\n}"}' \
+        https://services.unity.com/graphql \
+        -o archive \
+        || (error "Could not fetch Unity archive" && exit 1)
+
+    HASH=`grep -oE "unityhub://$UNITY_VER/\w+" archive | cut -d/ -f4` || (error "Unity version not found in archive" && exit 1)
+    URL="https://download.unity3d.com/download_unity/$HASH/LinuxEditorInstaller/Unity.tar.xz"
 
     info "Downloading Unity from $URL ..."
     curl $URL -o Unity.tar.xz || (error "Could not download Unity" && exit 1)
@@ -242,6 +246,8 @@ transform_installation
 check_unity $2
 popd
 create_compatibility_files
+
+mkdir -p ~/.local/share/applications
 
 cat <<EOF >~/.local/share/applications/hearthstone.desktop
 [Desktop Entry]
