@@ -29,6 +29,10 @@ Install the required packages:
   ```
   sudo pacman -S base-devel crypto++ webkit2gtk git curl python python-virtualenv
   ```
+- Fedora Silverblue
+  ```
+  rpm-ostree install webkit2gtk3-devel cryptopp-devel gtk3-devel gcc-c++
+  ```
 
 Then clone the repository:
 
