@@ -142,7 +142,7 @@ download_unity() {
     info "Fetching Unity archive ..."
 
     # Use GraphQL endpoint to retrieve archive hash
-    curl --silent --json '{"operationName":"GetRelease","variables":{"version":"'$UNITY_VER'","limit":300},"query":"query GetRelease($limit: Int, $skip: Int, $version: String!, $stream: [UnityReleaseStream!]) {\n getUnityReleases(\nlimit: $limit\nskip: $skip\nstream: $stream\nversion: $version\nentitlements: [XLTS]\n ) {\ntotalCount\nedges {\n node {\n version\n entitlements\n releaseDate\n unityHubDeepLink\n stream\n __typename\n }\n __typename\n}\n__typename\n }\n}"}' \
+    curl --silent -X POST -H "Content-Type: application/json" -d '{"operationName":"GetRelease","variables":{"version":"'$UNITY_VER'","limit":300},"query":"query GetRelease($limit: Int, $skip: Int, $version: String!, $stream: [UnityReleaseStream!]) {\n getUnityReleases(\nlimit: $limit\nskip: $skip\nstream: $stream\nversion: $version\nentitlements: [XLTS]\n ) {\ntotalCount\nedges {\n node {\n version\n entitlements\n releaseDate\n unityHubDeepLink\n stream\n __typename\n }\n __typename\n}\n__typename\n }\n}"}' \
         https://services.unity.com/graphql \
         -o archive \
         || (error "Could not fetch Unity archive" && exit 1)
