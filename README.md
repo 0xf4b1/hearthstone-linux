@@ -21,8 +21,10 @@ Install the required packages:
 - Debian/Ubuntu
 
   ```
-  sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.\*-dev git curl python3 python3-venv python-is-python3
+  sudo apt install build-essential libcrypto++-dev libwebkit2gtk-4.1-dev git curl python3 python3-venv python-is-python3
   ```
+
+  If you are running a distro that does not have `libwebkit2gtk-4.1-dev`, use `libwebkit2gtk-4.0-dev` instead.
 
 - Arch Linux/Manjaro
 
