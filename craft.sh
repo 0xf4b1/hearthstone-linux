@@ -78,7 +78,7 @@ init_hearthstone() {
 check_version() {
     set_region
     set_locale
-    VERSION=$(curl -s http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
+    VERSION=$(curl -sL http://${REGION}.patch.battle.net:1119/hsb/versions | grep $REGION)
     VERSION=${VERSION%|*}
     VERSION=${VERSION##*|}
 
