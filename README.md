@@ -35,6 +35,7 @@ Install the required packages:
   ```
   rpm-ostree install webkit2gtk3-devel cryptopp-devel gtk3-devel gcc-c++
   ```
+  On Fedora Gnome you may also need `gdk-pixbuf2-modules-extra` for the Desktop icon to load.
 
 Then clone the repository:
 
