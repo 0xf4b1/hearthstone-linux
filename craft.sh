@@ -94,7 +94,13 @@ check_version() {
 
 download_hearthstone() {
     info "Downloading Hearthstone via keg ..."
-    $NGDP_BIN --cdn "http://level3.blizzard.com/tpr/hs" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
+    CDN_DOMAIN="http://level3.blizzard.com/tpr/hs"
+    if [ "${REGION}" == "cn" ]; then
+        # China mainland region uses different CDN from blizzard
+        CDN_DOMAIN="https://blzdist-hs.necdn.leihuo.netease.com/tpr/hs"
+        info "Using CN CDN from netease: $CDN_DOMAIN"
+    fi
+    $NGDP_BIN --cdn "${CDN_DOMAIN}" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
     $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
     echo $VERSION >.version
 }
