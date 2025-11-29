@@ -131,6 +131,9 @@ int main(int argc, char *argv[]) {
     g_signal_connect(web, "load-changed", G_CALLBACK(web_view_load_changed), NULL);
     webkit_web_view_load_uri(web, url);
 
+    GdkRGBA color = { 0.082, 0.09, 0.118, 1.0 };
+    webkit_web_view_set_background_color(web, &color);
+
     gtk_widget_grab_focus(GTK_WIDGET(web));
 
     gtk_widget_show_all(win);
