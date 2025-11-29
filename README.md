@@ -136,6 +136,18 @@ Since old files are never removed, it can consume a lot of space. However, if we
 If you have other issues, have a look through the [existing issues](https://github.com/0xf4b1/hearthstone-linux/issues?q=) and if that does not help create a [new issue](https://github.com/0xf4b1/hearthstone-linux/issues/new).
 Don't forget to add logs from `Bin/Logs/` that might be helpful for troubleshooting.
 
+> The login utility crashes with `Error 71 (Protocol error) dispatching to Wayland display.`
+
+This is a known WebKit issue with Wayland and NVIDIA drivers. Possible workarounds include running the login utility with `WEBKIT_DISABLE_DMABUF_RENDERER=1` or `__NV_DISABLE_EXPLICIT_SYNC=1`:
+
+```bash
+WEBKIT_DISABLE_DMABUF_RENDERER=1 ./login
+
+# OR
+
+__NV_DISABLE_EXPLICIT_SYNC=1 ./login
+```
+
 ## How does it work?
 
 The `craft.sh` script copies and rearranges the needed files for your Linux client and additionally does the following tasks:
