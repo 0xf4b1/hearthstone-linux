@@ -24,17 +24,26 @@ error() {
     print $RED "$1"
 }
 
+create_venv() {
+    info "Creating python venv for keg ..."
+    python -m venv venv
+    source venv/bin/activate
+    pushd keg
+    pip install .
+    popd
+}
+
+check_keg()
+{
+    $NGDP_BIN --help >/dev/null
+}
+
 ensure_keg() {
     if [ ! -d venv ]; then
-      info "Creating python venv for keg ..."
-      python -m venv venv
-      source venv/bin/activate
-      pushd keg
-      pip install .
-      popd
+      create_venv
     fi
     source venv/bin/activate
-    $NGDP_BIN --help >/dev/null || (error "keg is not working" && exit 1)
+    check_keg || (create_venv && check_keg) || (error "keg is not working" && exit 1)
 }
 
 set_region() {
