@@ -211,6 +211,13 @@ create_compatibility_files() {
     cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
     cp stubs/libblz_commerce_sdk_plugin.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
 
+    # The game P/Invokes CoreFoundation via the macOS absolute path, which Mono
+    # can't find on Linux. Map it to the stub.
+    MONO_CONFIG=$TARGET_PATH/Bin/Hearthstone_Data/MonoBleedingEdge/etc/mono/config
+    if [ -f $MONO_CONFIG ] && ! grep -q 'dll="/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"' $MONO_CONFIG; then
+        sed -i "s|</configuration>|    <dllmap dll=\"/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation\" target=\"$TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation.so\" os=\"!osx\"/>\n</configuration>|" $MONO_CONFIG
+    fi
+
     make -C login
     cp login/login $TARGET_PATH
 }
