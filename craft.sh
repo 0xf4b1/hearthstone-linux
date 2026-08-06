@@ -192,8 +192,6 @@ transform_installation() {
     info "Transform installation ..."
 
     mkdir -p Bin
-    mv Hearthstone.app/Contents/Resources/Data Bin/Hearthstone_Data
-    mv Hearthstone.app/Contents/Resources/'unity default resources' Bin/Hearthstone_Data/Resources
     mv Hearthstone.app/Contents/Resources/PlayerIcon.icns Bin/Hearthstone_Data/Resources
 
     rm -rf Hearthstone.app
