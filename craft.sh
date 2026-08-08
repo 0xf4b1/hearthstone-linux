@@ -156,9 +156,8 @@ download_unity() {
 
     info "Fetching Unity archive ..."
 
-    # Use GraphQL endpoint to retrieve archive hash
-    curl --silent -X POST -H "Content-Type: application/json" -d '{"operationName":"GetRelease","variables":{"version":"'$UNITY_VER'","limit":300},"query":"query GetRelease($limit: Int, $skip: Int, $version: String!, $stream: [UnityReleaseStream!]) {\n getUnityReleases(\nlimit: $limit\nskip: $skip\nstream: $stream\nversion: $version\nentitlements: [XLTS]\n ) {\ntotalCount\nedges {\n node {\n version\n entitlements\n releaseDate\n unityHubDeepLink\n stream\n __typename\n }\n __typename\n}\n__typename\n }\n}"}' \
-        https://services.unity.com/graphql \
+    # Use Unity Hub release API to retrieve archive hash
+    curl --silent "https://services.api.unity.com/unity/editor/release/v1/releases?version=$UNITY_VER&limit=5" \
         -o archive \
         || (error "Could not fetch Unity archive" && exit 1)
 
@@ -193,8 +192,6 @@ transform_installation() {
     info "Transform installation ..."
 
     mkdir -p Bin
-    mv Hearthstone.app/Contents/Resources/Data Bin/Hearthstone_Data
-    mv Hearthstone.app/Contents/Resources/'unity default resources' Bin/Hearthstone_Data/Resources
     mv Hearthstone.app/Contents/Resources/PlayerIcon.icns Bin/Hearthstone_Data/Resources
 
     rm -rf Hearthstone.app
@@ -211,6 +208,13 @@ create_compatibility_files() {
     cp stubs/CoreFoundation.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework
     cp stubs/libOSXWindowManagement.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
     cp stubs/libblz_commerce_sdk_plugin.so $TARGET_PATH/Bin/Hearthstone_Data/Plugins
+
+    # The game P/Invokes CoreFoundation via the macOS absolute path, which Mono
+    # can't find on Linux. Map it to the stub.
+    MONO_CONFIG=$TARGET_PATH/Bin/Hearthstone_Data/MonoBleedingEdge/etc/mono/config
+    if [ -f $MONO_CONFIG ] && ! grep -q 'dll="/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"' $MONO_CONFIG; then
+        sed -i "s|</configuration>|    <dllmap dll=\"/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation\" target=\"$TARGET_PATH/Bin/Hearthstone_Data/Plugins/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation.so\" os=\"!osx\"/>\n</configuration>|" $MONO_CONFIG
+    fi
 
     make -C login
     cp login/login $TARGET_PATH
