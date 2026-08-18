@@ -191,7 +191,18 @@ transform_installation() {
     fi
     info "Transform installation ..."
 
+    # Move the game's Unity data bundle (level0, globalgamemanagers,
+    # resources.assets, Managed, ...) into Bin/Hearthstone_Data. Drop any stale
+    # target so the move renames Data into place instead of nesting inside it.
+    mkdir -p Bin
+    rm -rf Bin/Hearthstone_Data
+    mv Hearthstone.app/Contents/Resources/Data Bin/Hearthstone_Data
+
     mkdir -p Bin/Hearthstone_Data/Resources
+    # In some game builds the Unity built-in resources live outside Data/
+    if [ -f "Hearthstone.app/Contents/Resources/unity default resources" ]; then
+        mv Hearthstone.app/Contents/Resources/'unity default resources' Bin/Hearthstone_Data/Resources
+    fi
     mv Hearthstone.app/Contents/Resources/PlayerIcon.icns Bin/Hearthstone_Data/Resources
 
     rm -rf Hearthstone.app
