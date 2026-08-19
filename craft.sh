@@ -162,13 +162,14 @@ download_unity() {
         || (error "Could not fetch Unity archive" && exit 1)
 
     HASH=`grep -oE "unityhub://$UNITY_VER/\w+" archive | cut -d/ -f4` || (error "Unity version not found in archive" && exit 1)
-    URL="https://download.unity3d.com/download_unity/$HASH/LinuxEditorInstaller/Unity.tar.xz"
+    URL="https://download.unity3d.com/download_unity/$HASH/MacEditorTargetInstaller/UnitySetup-Linux-Mono-Support-for-Editor-$UNITY_VER.pkg"
 
     info "Downloading Unity from $URL ..."
-    curl $URL -o Unity.tar.xz || (error "Could not download Unity" && exit 1)
+    curl $URL -o Unity.pkg || (error "Could not download Unity" && exit 1)
 
     info "Extracting Unity ..."
-    tar -xf Unity.tar.xz $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
+    7z x Unity.pkg
+    7z x Payload~ $UNITY_ENGINE/LinuxPlayer $UNITY_ENGINE/UnityPlayer.so $UNITY_ENGINE/Data/MonoBleedingEdge/
     UNITY_PATH=$PWD/$UNITY_ENGINE
 
     popd
