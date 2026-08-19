@@ -103,14 +103,24 @@ check_version() {
 
 download_hearthstone() {
     info "Downloading Hearthstone via keg ..."
-    CDN_DOMAIN="http://level3.blizzard.com/tpr/hs"
-    if [ "${REGION}" == "cn" ]; then
+    # Use regional CDNs for better download speed; level3.blizzard.com is a slow global fallback
+    if [ "${REGION}" == "eu" ]; then
+        CDN_DOMAIN="http://eu.cdn.blizzard.com/tpr/hs"
+    elif [ "${REGION}" == "us" ]; then
+        CDN_DOMAIN="http://us.cdn.blizzard.com/tpr/hs"
+    elif [ "${REGION}" == "kr" ]; then
+        CDN_DOMAIN="http://kr.cdn.blizzard.com/tpr/hs"
+    elif [ "${REGION}" == "cn" ]; then
         # China mainland region uses different CDN from blizzard
         CDN_DOMAIN="https://blzdist-hs.necdn.leihuo.netease.com/tpr/hs"
-        info "Using CN CDN from netease: $CDN_DOMAIN"
+    else
+        CDN_DOMAIN="http://level3.blizzard.com/tpr/hs"
     fi
-    $NGDP_BIN --cdn "${CDN_DOMAIN}" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
-    $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
+    info "Using CDN: $CDN_DOMAIN"
+    # Fetch config/metadata from the global CDN (regional CDNs only host data files, not config)
+    $NGDP_BIN fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
+    # Download game data from the faster regional CDN
+    $NGDP_BIN --cdn "${CDN_DOMAIN}" install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
     echo $VERSION >.version
 }
 
