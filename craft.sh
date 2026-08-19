@@ -248,6 +248,13 @@ check_directory() {
         init_hearthstone
     else
         pushd hearthstone
+        # Reinitialize ngdp if db is corrupt/empty
+        if [ ! -s .ngdp/keg.db ] || ! $NGDP_BIN fsck >/dev/null 2>&1; then
+            warn "keg database is empty or corrupt, reinitializing ..."
+            set_region
+            $NGDP_BIN init
+            $NGDP_BIN remote add http://${REGION}.patch.battle.net:1119/hsb
+        fi
     fi
 
     # Update procedure
