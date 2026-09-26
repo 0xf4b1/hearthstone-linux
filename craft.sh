@@ -109,7 +109,19 @@ download_hearthstone() {
         CDN_DOMAIN="https://blzdist-hs.necdn.leihuo.netease.com/tpr/hs"
         info "Using CN CDN from netease: $CDN_DOMAIN"
     fi
-    $NGDP_BIN --cdn "${CDN_DOMAIN}" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production
+    attempts=0
+    while true; do
+        attempts=$((attempts+1))
+        if $NGDP_BIN --cdn "${CDN_DOMAIN}" fetch http://${REGION}.patch.battle.net:1119/hsb --tags OSX --tags ${LOCALE} --tags Production; then
+            break
+        fi
+        if [ "${attempts}" -ge 10 ]; then
+            error "Failed to fetch files from Battle.Net servers after $attempts attempts"
+            exit 1
+        fi
+        warn "Fetching files failed, retrying (${attempts}/10) ..."
+        sleep 2
+    done
     $NGDP_BIN install http://${REGION}.patch.battle.net:1119/hsb $VERSION --tags OSX --tags ${LOCALE} --tags Production
     echo $VERSION >.version
 }
